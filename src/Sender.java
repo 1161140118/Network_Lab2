@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -27,6 +28,9 @@ public class Sender {
     private final InetAddress inetAddress;
     private final int port;
     private final int localPort = 12340;
+    
+    private final String testFile; // 测试文件路径
+    private final List<String> fileFrag = new ArrayList<>();
 
     private int nextSeq; // 当前数据包seq
     private int sendBase; // 当前等待确认的ack
@@ -39,9 +43,10 @@ public class Sender {
      * @throws SocketException 
      * 
      */
-    public Sender(InetAddress inetAddress,int port) throws SocketException {
+    public Sender(InetAddress inetAddress,int port,String testfile) throws SocketException {
         this.inetAddress = inetAddress;
         this.port = port;
+        testFile = testfile;
         datagramSocket = new DatagramSocket(localPort);
     }
     
@@ -66,9 +71,10 @@ public class Sender {
 
     /**
      * 超时重传：超时时，滑动窗口内的数据帧都要重传
+     * @param i 序列号i数据帧超时
      */
-    private void timeOutHandler() {
-  
+    private void timeOutHandler(int i) {
+        
         
     }
 
@@ -99,11 +105,18 @@ public class Sender {
         }
     }
 
-    private void sendData(String data) {
+    private void sendData(String data) throws IOException {
          byte[] buffer = ( (char)nextSeq + data).getBytes();
-         DatagramPacket datagramPacket = new DatagramPacket(buffer, buffer.length);
+         DatagramPacket datagramPacket = new DatagramPacket(buffer, buffer.length,inetAddress,port);
+         datagramSocket.send(datagramPacket);
          
-         
+    }
+    
+    private void receiveAck() throws IOException {
+        byte[] bytes = new byte[4096];
+        DatagramPacket datagramPacket = new DatagramPacket(bytes, bytes.length);
+        datagramSocket.receive(datagramPacket);
+        ackHandler((char)bytes[0]);
     }
 
     private int incNextSeq() {
