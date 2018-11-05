@@ -97,7 +97,6 @@ public class Receiver extends Thread {
 
         try {
             datagramSocket.receive(datagramPacket);
-            System.out.println("收到数据报 "+buffer[0]+" : "+new String(buffer, 1, 10));
             
             if (Math.random()<timeoutPro) {
                 // 随机数模拟超时
@@ -105,6 +104,7 @@ public class Receiver extends Thread {
                 return null;
             }
             
+            System.out.println("收到数据报 "+buffer[0]+" : "+new String(buffer, 1, 10));
             datagramSocket.send(new DatagramPacket(((char) buffer[0] + "0").getBytes(), 2,
                     senderInetAddress, senderPort)); // 返回ACK
             String string = new String(buffer, 1, bufferLength - 2);

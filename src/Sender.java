@@ -97,11 +97,8 @@ public class Sender extends Thread {
     @Override
     public void run() {
         while (totalAck < totalPacker) {
-            // 循环直到均已确认
-            // System.out
-            // .println("已确认/已发送/总任务 ： " + totalAck + " / " + totalsend + " / " + totalPacker);
-            // System.out.println(Arrays.toString(ack));
-            while (sendDatagram()); // 窗口有空闲，即发送
+     
+            sendDatagram();
             // receiveAck(); // 接收处理ack，窗口滑动
             try {
                 Thread.sleep(200);
